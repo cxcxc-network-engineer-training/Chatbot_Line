@@ -18,10 +18,18 @@ services:
 #     - ./redis/data:/data
 #     - ./redis/redis.config:/usr/local/etc/redis/redis.conf
   jupyter-tutorial:
-    image: jupyter/base-notebook
+    build: .
     container_name: chatbot_jupyter
     ports:
       - "8888:8888"
     command: start-notebook.sh --NotebookApp.token=''
-#    volumes:
-#     - ./work:/home/jovyan/work
+    volumes:
+     - ./code:/home/jovyan/work
+  ngrok-external-dns:
+    image: wernight/ngrok
+    depends_on: 
+      - jupyter-tutorial
+    container_name: chatbot_ngrok
+    ports:
+      - "4040:4040"
+    command: ngrok http chatbot_jupyter:5000
