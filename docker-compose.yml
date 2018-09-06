@@ -1,14 +1,14 @@
 version: '3'
 services:
   mock_server:
-    image: flowwherecat/jsonserver:2.0
+    image: flowwherecat/jsonserver:2.2
     container_name: chatbot_api
     ports:
       - "3000:3000"
     stdin_open: true
     tty: true
     working_dir: /mock
-    command: json-server --host 0.0.0.0 --id question_id -i user_open_id -i users_id   db.json --routes routes.json
+    command: json-server --host 0.0.0.0 --id question_id -i user_open_id -i menu_id   db.json --routes routes.json
   redis:
     container_name: chatbot_redis
     image: redis:5.0-rc4
