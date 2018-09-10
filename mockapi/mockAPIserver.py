@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # In[ ]:
@@ -7,8 +7,7 @@
 from flask import Flask, jsonify,request
 import json
 from pprint import pprint
-
-
+#from urllib.parse import urlsplit, parse_qs
 usercheck=open('/home/mockapi/user.json','r')
 menucheck=open('/home/mockapi/menu.json','r')
 sacheck=open('/home/mockapi/sa.json','r')
@@ -21,13 +20,12 @@ jsonDevlop = json.load(devlopcheck)
 jsonSysops = json.load(sysopscheck)
 
 
-pprint(jsonSa)
-
-
 # In[ ]:
 
 
 app = Flask(__name__)
+
+    
 
 @app.route('/user/<string:user_open_id>')
 def get_single_user(user_open_id):
@@ -35,6 +33,8 @@ def get_single_user(user_open_id):
         if singleuser['user_open_id'] == user_open_id:
             return jsonify(singleuser)
     return jsonify ({'message': 'store not found'})
+
+
 
 @app.route('/user' , methods=['POST'])
 def create_user():
@@ -49,6 +49,9 @@ def create_user():
             }
     jsonUser.append(new_user)
     return jsonify(new_user)
+
+
+
 
 @app.route('/user/<string:user_open_id>', methods=['PUT'])
 def update_task(user_open_id):
@@ -73,14 +76,31 @@ def update_task(user_open_id):
 
 
 
+  
+
+
 @app.route('/users')
 def get_users():
  
     user_open_id =request.args['user_open_id']
-    for searchuser in jsonUser:
-        if searchuser['user_open_id'] == user_open_id:
-            return jsonify(searchuser)
-      
+    a = user_open_id.split(",")
+    b=len(a)
+    c=[]
+    for i in range(0,b):
+        for searchuser in jsonUser:
+            if searchuser['user_open_id'] == a[i]:
+                c.append(searchuser)
+                print(a[i])
+    return jsonify(c)
+
+        
+        
+        
+        
+        
+        
+
+    
     
 @app.route('/menu',methods=['POST'])
 def get_menu():
@@ -93,7 +113,9 @@ def get_menu():
             }
     jsonMenu.append(new_menu)
     return jsonify({"status_describe":"success add menu"})
-        
+    
+    
+    
     
 @app.route('/question/sa')
 def get_sa():
@@ -122,7 +144,11 @@ def get_sys():
     for qsa in jsonSysops:
         if qsa['question_id'] == sys_id:
             return jsonify(qsa)     
-       
+    
+    
+    
+    
+    
     
 if __name__ == "__main__":
     app.run(host='0.0.0.0',port=5000 )
