@@ -5,9 +5,9 @@ services:
     container_name: chatbot_mockapi
     ports:
       - "5000:5000"
-    command: python /home/jovyan/mockapi/mockAPIserver.py
+    command: python /home/mockapi/mockAPIserver.py
     volumes:
-     - ./mockapi:/home/jovyan/mockapi
+     - ./mockapi:/home/mockapi
   redis:
     container_name: chatbot_redis
     image: redis:5.0-rc4

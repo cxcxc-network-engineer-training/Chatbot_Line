@@ -9,11 +9,11 @@ import json
 from pprint import pprint
 
 
-usercheck=open('/home/jovyan/mockapi/user.json','r')
-menucheck=open('/home/jovyan/mockapi/menu.json','r')
-sacheck=open('/home/jovyan/mockapi/sa.json','r')
-devlopcheck=open('/home/jovyan/mockapi/devlop.json','r')
-sysopscheck=open('/home/jovyan/mockapi/sysops.json','r')
+usercheck=open('/home/mockapi/user.json','r')
+menucheck=open('/home/mockapi/menu.json','r')
+sacheck=open('/home/mockapi/sa.json','r')
+devlopcheck=open('/home/mockapi/devlop.json','r')
+sysopscheck=open('/home/mockapi/sysops.json','r')
 jsonUser = json.load(usercheck)
 jsonMenu = json.load(menucheck)
 jsonSa = json.load(sacheck)
