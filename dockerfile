@@ -1,5 +1,4 @@
-#jupyter-basenotebook with flask
-
+#ubuntu:latest with flask
 FROM ubuntu:latest
 LABEL maintainer="Ping<pingchen0331@gmail.com>"
 USER root
