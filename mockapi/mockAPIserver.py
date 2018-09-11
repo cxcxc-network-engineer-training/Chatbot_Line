@@ -1,14 +1,13 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # In[ ]:
 
 
-from flask import Flask, jsonify,request
+from flask import Flask, jsonify,request,abort
 import json
 from pprint import pprint
-
-
+#from urllib.parse import urlsplit, parse_qs
 usercheck=open('/home/mockapi/user.json','r')
 menucheck=open('/home/mockapi/menu.json','r')
 sacheck=open('/home/mockapi/sa.json','r')
@@ -21,13 +20,16 @@ jsonDevlop = json.load(devlopcheck)
 jsonSysops = json.load(sysopscheck)
 
 
-pprint(jsonSa)
-
-
 # In[ ]:
 
 
 app = Flask(__name__)
+
+@app.route('/')
+def welcome():
+    return ' Hello! welcome to cc102 Mock APIserver'
+
+
 
 @app.route('/user/<string:user_open_id>')
 def get_single_user(user_open_id):
@@ -35,6 +37,8 @@ def get_single_user(user_open_id):
         if singleuser['user_open_id'] == user_open_id:
             return jsonify(singleuser)
     return jsonify ({'message': 'store not found'})
+
+
 
 @app.route('/user' , methods=['POST'])
 def create_user():
@@ -50,21 +54,24 @@ def create_user():
     jsonUser.append(new_user)
     return jsonify(new_user)
 
+
+
+
 @app.route('/user/<string:user_open_id>', methods=['PUT'])
 def update_task(user_open_id):
     task = [task for task in jsonUser if task['user_open_id'] == user_open_id]
-    if len(task) == 0:
-        abort(404)
-    if not request.json:
-        abort(400)
-    if 'user_nick_name' in request.json and type(request.json['user_nick_name']) != str:
-        abort(400)
-    if 'user_status' in request.json and type(request.json['user_status']) is not str:
-        abort(400)
-    if 'user_img' in request.json and type(request.json['user_img']) is not str:
-        abort(400)
-    if 'user_register_menu' in request.json and type(request.json['user_img']) is not str:
-        abort(400)
+ #   if len(task) == 0:
+ #      abort(404)
+ #   if not request.json:
+ #       abort(400)
+ #  if 'user_nick_name' in request.json and type(request.json['user_nick_name']) != str:
+ #       abort(400)
+ #   if 'user_status' in request.json and type(request.json['user_status']) is not str:
+ #       abort(400)
+ #   if 'user_img' in request.json and type(request.json['user_img']) is not str:
+ #       abort(400)
+ #   if 'user_register_menu' in request.json and type(request.json['user_img']) is not str:
+ #       abort(400)
     task[0]['user_nick_name'] = request.json.get('user_nick_name', task[0]['user_nick_name'])
     task[0]['user_status'] = request.json.get('user_status', task[0]['user_status'])
     task[0]['user_img'] = request.json.get('user_img', task[0]['user_img'])
@@ -73,14 +80,31 @@ def update_task(user_open_id):
 
 
 
+  
+
+
 @app.route('/users')
 def get_users():
  
     user_open_id =request.args['user_open_id']
-    for searchuser in jsonUser:
-        if searchuser['user_open_id'] == user_open_id:
-            return jsonify(searchuser)
-      
+    a = user_open_id.split(",")
+    b=len(a)
+    c=[]
+    for i in range(0,b):
+        for searchuser in jsonUser:
+            if searchuser['user_open_id'] == a[i]:
+                c.append(searchuser)
+                print(a[i])
+    return jsonify(c)
+
+        
+        
+        
+        
+        
+        
+
+    
     
 @app.route('/menu',methods=['POST'])
 def get_menu():
@@ -93,7 +117,9 @@ def get_menu():
             }
     jsonMenu.append(new_menu)
     return jsonify({"status_describe":"success add menu"})
-        
+    
+    
+    
     
 @app.route('/question/sa')
 def get_sa():
@@ -122,7 +148,11 @@ def get_sys():
     for qsa in jsonSysops:
         if qsa['question_id'] == sys_id:
             return jsonify(qsa)     
-       
+    
+    
+    
+    
+    
     
 if __name__ == "__main__":
     app.run(host='0.0.0.0',port=5000 )
