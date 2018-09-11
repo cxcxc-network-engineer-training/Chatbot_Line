@@ -4,7 +4,7 @@
 # In[ ]:
 
 
-from flask import Flask, jsonify,request
+from flask import Flask, jsonify,request,abort
 import json
 from pprint import pprint
 #from urllib.parse import urlsplit, parse_qs
@@ -25,7 +25,11 @@ jsonSysops = json.load(sysopscheck)
 
 app = Flask(__name__)
 
-    
+@app.route('/')
+def welcome():
+    return ' Hello! welcome to cc102 Mock APIserver'
+
+
 
 @app.route('/user/<string:user_open_id>')
 def get_single_user(user_open_id):
@@ -56,18 +60,18 @@ def create_user():
 @app.route('/user/<string:user_open_id>', methods=['PUT'])
 def update_task(user_open_id):
     task = [task for task in jsonUser if task['user_open_id'] == user_open_id]
-    if len(task) == 0:
-        abort(404)
-    if not request.json:
-        abort(400)
-    if 'user_nick_name' in request.json and type(request.json['user_nick_name']) != str:
-        abort(400)
-    if 'user_status' in request.json and type(request.json['user_status']) is not str:
-        abort(400)
-    if 'user_img' in request.json and type(request.json['user_img']) is not str:
-        abort(400)
-    if 'user_register_menu' in request.json and type(request.json['user_img']) is not str:
-        abort(400)
+ #   if len(task) == 0:
+ #      abort(404)
+ #   if not request.json:
+ #       abort(400)
+ #  if 'user_nick_name' in request.json and type(request.json['user_nick_name']) != str:
+ #       abort(400)
+ #   if 'user_status' in request.json and type(request.json['user_status']) is not str:
+ #       abort(400)
+ #   if 'user_img' in request.json and type(request.json['user_img']) is not str:
+ #       abort(400)
+ #   if 'user_register_menu' in request.json and type(request.json['user_img']) is not str:
+ #       abort(400)
     task[0]['user_nick_name'] = request.json.get('user_nick_name', task[0]['user_nick_name'])
     task[0]['user_status'] = request.json.get('user_status', task[0]['user_status'])
     task[0]['user_img'] = request.json.get('user_img', task[0]['user_img'])
