@@ -1,15 +1,5 @@
 version: '3'
 services:
-  mockapi:
-    build: 
-      context: .
-      dockerfile: dockerfile-mockapi 
-    container_name: chatbot_mockapi
-    ports:
-            - "5005:5005"
-    command: python /home/mockapi/mockAPIserver.py
-    volumes:
-     - ./mockapi:/home/mockapi
   redis:
     container_name: chatbot_redis
     image: redis:4
