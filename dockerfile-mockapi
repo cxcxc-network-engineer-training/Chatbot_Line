@@ -11,6 +11,4 @@ RUN apt-get install python-pip python3 -y
 RUN pip install --upgrade pip
 #install flask
 RUN pip install flask==0.12
-#run py
-#RUN python /home/jovyan/mockapi/mockAPIserver.py 
 
