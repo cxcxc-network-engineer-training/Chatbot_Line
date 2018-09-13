@@ -51,10 +51,11 @@ jupyter: ./work
 新增ngork整合入docker-compose 
 更改mockapi的port
 更改jupyter映射資料夾
+更改redis版本為4.0
 
 #image
 mockapi: dockerfile-mockapi
-redis: redis:5.0-rc4
+redis: redis:4.0
 jupyter: dockerfile-jupyter
 ngrok: wernight/ngrok
 
