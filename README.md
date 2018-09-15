@@ -1,13 +1,13 @@
 # Chatbot_Line
 -------------------------
-2018/9/4：
+*2018/9/4：
 建置Mock server環境
 修復Mock server無法新增的問題
 建置Redis環境
 建置Jupyter環境compose
 整合成Docker-compose
 
-2018/9/10:
+*2018/9/10:
 
 #dockerfile
 以dockerfile撰寫mockapi
@@ -35,7 +35,7 @@ mockapi: ./mockapi
 redis: ./data
 jupyter: ./work
 
-2018/9/13
+*2018/9/13
 
 #dockerfile 
 
@@ -70,3 +70,9 @@ ngrok:4040
 mockapi: ./mockapi
 redis: ./data
 jupyter: ./code
+
+
+*2018/09/15
+將所有image更改為dockerfile形式
+新增dockerfile 資料夾存放所有dockerfile
+新增jupyter與mockapi、redis的相依性關係
