@@ -83,3 +83,9 @@ jupyter: ./code
 #image/*
 也放了一些圖檔給menu使用
 要注意格式的部份
+
+2018/9/16
+
+#針對code/app.ipynb進行修改
+寫了message event跟postback event
+主要是有關於考古題的出題
