@@ -70,3 +70,16 @@ ngrok:4040
 mockapi: ./mockapi
 redis: ./data
 jupyter: ./code
+
+2018/9/14
+
+#針對code/app.ipynb進行修改
+主要是寫有關follow event的接口
+
+#寫一個code/menu.ipynb
+主要是寫有關製作menu_id的部份
+還有後續行為
+
+#image/*
+也放了一些圖檔給menu使用
+要注意格式的部份
