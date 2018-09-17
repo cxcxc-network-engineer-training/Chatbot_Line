@@ -1,7 +1,5 @@
 version: '3'
 services:
-<<<<<<< HEAD
-=======
   mockapi:
     build: 
       context: ./dockerfile
@@ -12,7 +10,6 @@ services:
     command: python /home/mockapi/mockAPIserver.py
     volumes:
      - ./mockapi:/home/mockapi
->>>>>>> 6f27b9b2e3161aab20287ff4de85ebcabd8347b4
   redis:
     build: 
       context: ./dockerfile
