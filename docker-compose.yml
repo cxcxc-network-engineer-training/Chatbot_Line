@@ -1,8 +1,23 @@
 version: '3'
 services:
+<<<<<<< HEAD
+=======
+  mockapi:
+    build: 
+      context: ./dockerfile
+      dockerfile: dockerfile-mockapi 
+    container_name: chatbot_mockapi
+    ports:
+            - "5005:5005"
+    command: python /home/mockapi/mockAPIserver.py
+    volumes:
+     - ./mockapi:/home/mockapi
+>>>>>>> 6f27b9b2e3161aab20287ff4de85ebcabd8347b4
   redis:
+    build: 
+      context: ./dockerfile
+      dockerfile: dockerfile-redis
     container_name: chatbot_redis
-    image: redis:4
     ports:
      - "6379:6379"
     volumes:
@@ -10,9 +25,12 @@ services:
 #     - ./redis/redis.config:/usr/local/etc/redis/redis.conf
   jupyter-tutorial:
     build: 
-      context: .
+      context: ./dockerfile
       dockerfile: dockerfile-jupyter
     container_name: chatbot_jupyter
+    depends_on: 
+      - mockapi
+      - redis
     ports:
       - "8888:8888"
       - "5000:5000"
@@ -20,10 +38,12 @@ services:
     volumes:
      - ./code:/home/jovyan/work
   ngrok-external-dns:
-    image: wernight/ngrok
+    build: 
+      context: ./dockerfile
+      dockerfile: dockerfile-ngrok
+    container_name: chatbot_ngrok
     depends_on: 
       - jupyter-tutorial
-    container_name: chatbot_ngrok
     ports:
       - "4040:4040"
     command: ngrok http chatbot_jupyter:5000
