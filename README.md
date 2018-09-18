@@ -71,8 +71,7 @@ mockapi: ./mockapi
 redis: ./data
 jupyter: ./code
 
-<<<<<<< HEAD
-2018/9/14
+*2018/9/14
 
 #針對code/app.ipynb進行修改
 主要是寫有關follow event的接口
@@ -85,15 +84,25 @@ jupyter: ./code
 也放了一些圖檔給menu使用
 要注意格式的部份
 
-2018/9/16
-
-#針對code/app.ipynb進行修改
-寫了message event跟postback event
-主要是有關於考古題的出題
-=======
-
 *2018/09/15
 將所有image更改為dockerfile形式
 新增dockerfile 資料夾存放所有dockerfile
 新增jupyter與mockapi、redis的相依性關係
->>>>>>> 6f27b9b2e3161aab20287ff4de85ebcabd8347b4
+
+*2018/9/16
+
+#針對code/app.ipynb進行修改
+寫了message event跟postback event
+主要是有關於考古題的出題
+
+*2018/9/17
+
+#跟老師的架構有誤差進行修改
+主要是quick reply的寫法，postback action 的data運用方式
+
+*2018/9/18
+
+#由於上傳了新的資料庫出現了一個新的bug，postback action 的text裝不下太大量的回覆
+主要是將原本裝在postback action的text用成postback event的方式回覆
+又順便將一些重複的程式寫成函式呼叫的方式
+
