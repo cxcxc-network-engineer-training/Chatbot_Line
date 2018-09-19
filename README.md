@@ -107,3 +107,10 @@ jupyter: ./code
 主要是將原本裝在postback action的text用成postback event的方式回覆
 又順便將一些重複的程式寫成函式呼叫的方式
 
+* 2018/9/19
+#對一些現有的功能進行優化，並合併開發分支
+/code/code.ipynb
+增加更多跟redis之間的交互關係，不使用亂數，改成客製化出題
+
+/code/menu_id.ipynb
+新增了一個程式碼是將需要的menu post 到API server
