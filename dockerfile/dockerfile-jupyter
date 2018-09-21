@@ -1,4 +1,4 @@
 #指定基底文件為jupyter/base-notebook
-FROM ubuntu:18.04
+FROM library/ubuntu:18.04
 #安裝flask 0.12, request, line-bot-sdk
 RUN pip install Flask==0.12 requests line-bot-sdk redis
