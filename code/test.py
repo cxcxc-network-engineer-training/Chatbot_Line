@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 # 從linebot 套件包裡引用 LineBotApi 與 WebhookHandler 類別
@@ -25,7 +25,7 @@ from linebot.models import (
 )
 
 
-# In[3]:
+# In[9]:
 
 
 """
@@ -53,7 +53,7 @@ import os
 ip_location=os.environ.get('IPA_ENV')
 
 
-# In[3]:
+# In[ ]:
 
 
 """
@@ -76,7 +76,7 @@ handler = WebhookHandler(secretFile.get("secret_key"))
 menu_id = secretFile.get("rich_menu_id")
 
 
-# In[4]:
+# In[ ]:
 
 
 '''
@@ -96,7 +96,7 @@ TextSendMessage(text="CC102-Line考古題機器人。\n請按功能選單進行�
     
 
 
-# In[5]:
+# In[ ]:
 
 
 """
@@ -139,7 +139,7 @@ def callback():
     return 'OK'
 
 
-# In[6]:
+# In[ ]:
 
 
 '''
@@ -210,7 +210,7 @@ def reply_text_and_get_user_profile(event):
     
 
 
-# In[7]:
+# In[ ]:
 
 
 #寫一個函式是看正解給result使用
@@ -229,7 +229,7 @@ def correct(a,answer):
         return wrong
 
 
-# In[8]:
+# In[ ]:
 
 
 """
@@ -289,7 +289,7 @@ def randontest(questiontype):
     return dev_reply_message_list
 
 
-# In[9]:
+# In[ ]:
 
 
 """
@@ -364,7 +364,7 @@ def test(questiontype,user_id,questionid):
 
 """
 def answer(qtype,qid):
-    url =  "http://%s:5001/question/%s" % (ip_location)
+    url =  "http://%s:5001/question/%s" % (ip_location,qtype)
     #裝query string的部份
     payload = {'question_id' : qid}
     #傳送封包
@@ -374,7 +374,7 @@ def answer(qtype,qid):
     return a
 
 
-# In[11]:
+# In[ ]:
 
 
 """
@@ -391,7 +391,7 @@ def answer(qtype,qid):
 @handler.add(PostbackEvent)
 def handle_post_message(event):
     #抓取user資料
-    user_profile = line_bot_api.get_profile(event.source.user_id)
+    user_profile = event.source.user_id
     #抓取postback action的data
     data = event.postback.data
     #用query string 解析data
@@ -399,28 +399,28 @@ def handle_post_message(event):
     #出考題
     if (data['type']==['question']):
         #每要求出題後，redis 的total增加一
-        redis.hincrby(user_profile.user_id,"total")
+        redis.hincrby(user_profile,"total")
         if (data['question_type']==['sysops']):
             #每次出一題sysops增加一個sys_qid
-            redis.hincrby(user_profile.user_id,"sys_qid")
+            redis.hincrby(user_profile,"sys_qid")
             #從redis擷取出來
-            questionid = redis.hget(user_profile.user_id,"sys_qid")
+            questionid = redis.hget(user_profile,"sys_qid")
             #回覆一組回覆串
             line_bot_api.reply_message(
             event.reply_token,
-            test('sysops',user_profile.user_id,questionid))
+            test('sysops',user_profile,questionid))
         elif (data['question_type']==['develop']):
-            redis.hincrby(user_profile.user_id,"dev_qid")
-            questionid = redis.hget(user_profile.user_id,"dev_qid")
+            redis.hincrby(user_profile,"dev_qid")
+            questionid = redis.hget(user_profile,"dev_qid")
             line_bot_api.reply_message(
             event.reply_token,
-            test('devlop',user_profile.user_id,questionid))
+            test('devlop',user_profile,questionid))
         elif (data['question_type']==['sa']):
-            redis.hincrby(user_profile.user_id,"sa_qid")
-            questionid = redis.hget(user_profile.user_id,"sa_qid")
+            redis.hincrby(user_profile,"sa_qid")
+            questionid = redis.hget(user_profile,"sa_qid")
             line_bot_api.reply_message(
             event.reply_token,
-            test('sa',user_profile.user_id,questionid))
+            test('sa',user_profile,questionid))
     #給按了答案的回覆
     elif (data['type']==['answer']):
         if (data['question_type']==['sysops']):
@@ -431,7 +431,7 @@ def handle_post_message(event):
             #假如正確的話回一個正確的reply
             if (data['result']==['True']):
                 #每答對一題，redis的result增加一
-                redis.hincrby(user_profile.user_id,"result") 
+                redis.hincrby(user_profile,"result") 
                 reply = 'Correct!!'
             #製作一個回覆list
             reply_message_list = [
@@ -449,7 +449,7 @@ def handle_post_message(event):
             reply = "Error\nAns:%s" %a["true_answer"]
             if (data['result']==['True']):
                 #每答對一題，redis的result增加一
-                redis.hincrby(user_profile.user_id,"result") 
+                redis.hincrby(user_profile,"result") 
                 reply = 'Correct!!'
     
             reply_message_list = [
@@ -466,7 +466,7 @@ def handle_post_message(event):
             reply = "Error\nAns:%s" %a["true_answer"]
             if (data['result']==['True']):
                 #每答對一題，redis的result增加一
-                redis.hincrby(user_profile.user_id,"result") 
+                redis.hincrby(user_profile,"result") 
                 reply = 'Correct!!'
     
             reply_message_list = [
@@ -481,11 +481,11 @@ def handle_post_message(event):
     
     #給之後的按鈕，看總答對跟回答題數
     elif (data['type']==['total']):
-        correct = redis.hget(user_profile.user_id,"result")
-        total = redis.hget(user_profile.user_id,"total")
-        sa_qid = redis.hget(user_profile.user_id,"sa_qid")
-        sys_qid = redis.hget(user_profile.user_id,"sys_qid")
-        dev_qid = redis.hget(user_profile.user_id,"dev_qid")
+        correct = redis.hget(user_profile,"result")
+        total = redis.hget(user_profile,"total")
+        sa_qid = redis.hget(user_profile,"sa_qid")
+        sys_qid = redis.hget(user_profile,"sys_qid")
+        dev_qid = redis.hget(user_profile,"dev_qid")
         line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text="各類回答紀錄\nsa:%s/100\ndeveloper:%s/100\nsysops:%s/100" % (sa_qid,sys_qid,dev_qid) ),
@@ -495,7 +495,7 @@ def handle_post_message(event):
         pass
 
 
-# In[12]:
+# In[ ]:
 
 
 '''
@@ -510,22 +510,22 @@ def handle_post_message(event):
 @handler.add(MessageEvent, message=TextMessage)
 #將這次event的參數抓進來
 def handle_message(event):
-    user_profile = line_bot_api.get_profile(event.source.user_id)
+    user_profile = event.source.user_id
     if (event.message.text.find('choose:')!= -1):
         pass
     elif (event.message.text.find('::record')!= -1):      
         #總答對題數
-        correct = redis.hget(user_profile.user_id,"result")
+        correct = redis.hget(user_profile,"result")
         #總回答題數
-        total = redis.hget(user_profile.user_id,"total")
+        total = redis.hget(user_profile,"total")
         #回覆的訊息串
         line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text="總共答對 (%s)題\n總共回答 (%s)題" % (correct,total)))
     elif (event.message.text.find(':record')!= -1):
-        sa_qid = redis.hget(user_profile.user_id,"sa_qid")
-        sys_qid = redis.hget(user_profile.user_id,"sys_qid")
-        dev_qid = redis.hget(user_profile.user_id,"dev_qid")
+        sa_qid = redis.hget(user_profile,"sa_qid")
+        sys_qid = redis.hget(user_profile,"sys_qid")
+        dev_qid = redis.hget(user_profile,"dev_qid")
         line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text="各類回答紀錄\nsa:%s/100\ndeveloper:%s/100\nsysops:%s/100" % (sa_qid,sys_qid,dev_qid) )
