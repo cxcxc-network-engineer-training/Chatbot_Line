@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 # 從linebot 套件包裡引用 LineBotApi 與 WebhookHandler 類別
@@ -25,7 +25,7 @@ from linebot.models import (
 )
 
 
-# In[9]:
+# In[2]:
 
 
 """
@@ -53,7 +53,7 @@ import os
 ip_location=os.environ.get('IPA_ENV')
 
 
-# In[ ]:
+# In[3]:
 
 
 """
@@ -76,7 +76,7 @@ handler = WebhookHandler(secretFile.get("secret_key"))
 menu_id = secretFile.get("rich_menu_id")
 
 
-# In[ ]:
+# In[4]:
 
 
 '''
@@ -96,7 +96,7 @@ TextSendMessage(text="CC102-Line考古題機器人。\n請按功能選單進行�
     
 
 
-# In[ ]:
+# In[5]:
 
 
 """
@@ -139,7 +139,7 @@ def callback():
     return 'OK'
 
 
-# In[ ]:
+# In[6]:
 
 
 '''
@@ -181,6 +181,7 @@ def reply_text_and_get_user_profile(event):
         "user_register_menu" : menu_id
     }
     #將json傳回API Server
+    #Endpoint='http://192.168.122.100:5001/users'
     Endpoint='http://%s:5001/users' % (ip_location)   
     Header={'Content-Type':'application/json'}
     Response=requests.post(Endpoint,headers=Header,data=json.dumps(user_info))
@@ -200,7 +201,7 @@ def reply_text_and_get_user_profile(event):
     # 回覆文字消息與圖片消息
     line_bot_api.reply_message(
          event.reply_token,
-         reply_message_list
+         TextSendMessage(text="請使用下方功能選單\n或是輸入下方字串\nrecord\ndetail")
     )
     
     #再跟老師討論存在redis的值有沒有需要進去mysql
@@ -210,7 +211,7 @@ def reply_text_and_get_user_profile(event):
     
 
 
-# In[ ]:
+# In[7]:
 
 
 #寫一個函式是看正解給result使用
@@ -229,7 +230,7 @@ def correct(a,answer):
         return wrong
 
 
-# In[ ]:
+# In[8]:
 
 
 """
@@ -289,7 +290,7 @@ def randontest(questiontype):
     return dev_reply_message_list
 
 
-# In[ ]:
+# In[9]:
 
 
 """
@@ -321,7 +322,7 @@ def test(questiontype,user_id,questionid):
                             #使用postback action類似按鈕的概念
                             action=PostbackAction(label="A",
                                                   #這邊使用true_answer()來幫助result
-                                                  data="type=answer&question_type=%s&question_id=%s&result=%s" % (questiontype,a['question_id'],true_answer(a,'A')),
+                                                  data="type=answer&question_type=%s&question_id=%s&result=%s" % (questiontype,questionid,true_answer(a,'A')),
                                                   text='choose:A'
                                                  )
                         ),
@@ -364,6 +365,7 @@ def test(questiontype,user_id,questionid):
 
 """
 def answer(qtype,qid):
+    #url =  "http://192.168.122.100:5001/question/%s" % (qtype)
     url =  "http://%s:5001/question/%s" % (ip_location,qtype)
     #裝query string的部份
     payload = {'question_id' : qid}
@@ -374,7 +376,7 @@ def answer(qtype,qid):
     return a
 
 
-# In[ ]:
+# In[11]:
 
 
 """
@@ -495,7 +497,7 @@ def handle_post_message(event):
         pass
 
 
-# In[ ]:
+# In[12]:
 
 
 '''
@@ -513,7 +515,7 @@ def handle_message(event):
     user_profile = event.source.user_id
     if (event.message.text.find('choose:')!= -1):
         pass
-    elif (event.message.text.find('::record')!= -1):      
+    elif (event.message.text.find('record')!= -1):      
         #總答對題數
         correct = redis.hget(user_profile,"result")
         #總回答題數
@@ -522,7 +524,7 @@ def handle_message(event):
         line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text="總共答對 (%s)題\n總共回答 (%s)題" % (correct,total)))
-    elif (event.message.text.find(':record')!= -1):
+    elif (event.message.text.find('detail')!= -1):
         sa_qid = redis.hget(user_profile,"sa_qid")
         sys_qid = redis.hget(user_profile,"sys_qid")
         dev_qid = redis.hget(user_profile,"dev_qid")
@@ -535,7 +537,7 @@ def handle_message(event):
     else:
         line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text="請使用下方功能選單\n或是輸入下方字串\n::record"))
+        TextSendMessage(text="請使用下方功能選單\n或是輸入下方字串\nrecord\ndetail"))
 
 
 # In[ ]:
