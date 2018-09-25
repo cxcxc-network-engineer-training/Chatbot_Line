@@ -65,7 +65,7 @@ ip_location=os.environ.get('IPA_ENV')
 import json
 
 # 載入基礎設定檔
-secretFile=json.load(open("./secret_key",'r'))
+secretFile=json.load(open("/home/jovyan/work/secret_key",'r'))
 server_url=secretFile.get("server_url")
 
 
@@ -117,7 +117,7 @@ from linebot.exceptions import (
 
 
 # 設定Server啟用細節
-app = Flask(__name__,static_url_path = "/images" , static_folder = "./images/")
+app = Flask(__name__,static_url_path = "/images" , static_folder = "/home/jovyan/work/images/")
 
 
 # 啟動server對外接口，使Line能丟消息進來
