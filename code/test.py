@@ -1,6 +1,12 @@
 
 # coding: utf-8
 
+# In[ ]:
+
+
+#跟app.ipynb差在ip使用方式，跟檔案使用絕對路徑
+
+
 # In[1]:
 
 
@@ -181,8 +187,8 @@ def reply_text_and_get_user_profile(event):
         "user_register_menu" : menu_id
     }
     #將json傳回API Server
-    #Endpoint='http://192.168.122.100:5001/users'
-    Endpoint='http://%s:5001/users' % (ip_location)   
+    Endpoint='http://%s:5001/users' % (ip_location)
+    #Endpoint='http://%s:5001/users' % (ip_location)   
     Header={'Content-Type':'application/json'}
     Response=requests.post(Endpoint,headers=Header,data=json.dumps(user_info))
     
@@ -201,7 +207,7 @@ def reply_text_and_get_user_profile(event):
     # 回覆文字消息與圖片消息
     line_bot_api.reply_message(
          event.reply_token,
-         TextSendMessage(text="請使用下方功能選單\n或是輸入下方字串\nrecord\ndetail")
+         TextSendMessage(text="請使用下方功能選單\n或是輸入下方字串\ndetail")
     )
     
     #再跟老師討論存在redis的值有沒有需要進去mysql
@@ -220,74 +226,6 @@ def true_answer(a,answer):
         return 'True'
     else:
         return 'False'
-
-def correct(a,answer):
-    if a['true_answer']==answer:
-        correct = 'Correct'+"\n"+a['true_answer_decribe_content']+"\n\n"+a['external_link']
-        return correct
-    else:
-        wrong = "error!,Ans:"+a['true_answer']+"\n"+a['true_answer_decribe_content']+"\n\n"+a['external_link']
-        return wrong
-
-
-# In[8]:
-
-
-"""
-
-    使用亂數跟題庫拿資料並回傳
-    並回傳quick reply 包含postback action 
-    內裝data方便後續動作
-
-"""
-import random
-#做一個回傳sys考題的函式
-def randontest(questiontype):
-    #跑亂數
-    qid=random.sample(range(1,101), 1)
-    #api server接口位置
-    a = answer(questiontype,qid)
-    #這邊使用quick reply的方式
-    quickreply = TextSendMessage(
-                text='Choose your answer:',
-                quick_reply=QuickReply(
-                    items=[
-                        QuickReplyButton(
-                            #使用postback action類似按鈕的概念
-                            action=PostbackAction(label="A",
-                                                  #這邊使用true_answer()來幫助result
-                                                  data="type=answer&question_type=%s&question_id=%s&result=%s" % (questiontype,a['question_id'],true_answer(a,'A')),
-                                                  text='choose:A'
-                                                 )
-                        ),
-                        QuickReplyButton(
-                            action=PostbackAction(label="B",
-                                                  data="type=answer&question_type=%s&question_id=%s&result=%s" % (questiontype,a['question_id'],true_answer(a,'B')),
-                                                  text='choose:B'
-    
-                                                 )
-                        ),
-                        QuickReplyButton(
-                            action=PostbackAction(label="C",
-                                                  data="type=answer&question_type=%s&question_id=%s&result=%s" % (questiontype,a['question_id'],true_answer(a,'C')),
-                                                  text='choose:C'
-                                                 )
-                        ),
-                        QuickReplyButton(
-                            action=PostbackAction(label="D",
-                                                  data="type=answer&question_type=%s&question_id=%s&result=%s" % (questiontype,a['question_id'],true_answer(a,'D')),
-                                                  text='choose:D'
-                                                 )
-                        )
-                    ]))
-    #全部回傳的list
-    dev_reply_message_list = [
-        TextSendMessage(text=a["question_content"]),
-        TextSendMessage(text=a["answer1_content"]+"\n\n"+a["answer2_content"]+"\n\n"+a["answer3_content"]+"\n\n"+a["answer4_content"]),
-        #回傳quick reply選單
-        quickreply    
-    ]
-    return dev_reply_message_list
 
 
 # In[9]:
@@ -365,8 +303,8 @@ def test(questiontype,user_id,questionid):
 
 """
 def answer(qtype,qid):
-    #url =  "http://192.168.122.100:5001/question/%s" % (qtype)
     url =  "http://%s:5001/question/%s" % (ip_location,qtype)
+    #url =  "http://%s:5001/question/%s" % (ip_location,qtype)
     #裝query string的部份
     payload = {'question_id' : qid}
     #傳送封包
@@ -377,6 +315,30 @@ def answer(qtype,qid):
 
 
 # In[11]:
+
+
+def result(questiontype,data,user_profile):
+    #去API取得考題資訊
+    a = answer(questiontype,data['question_id'][0])
+    #預設為錯誤的reply
+    reply = "Error\nAns:%s" %a["true_answer"]
+    #假如正確的話回一個正確的reply
+    if (data['result']==['True']):
+    #每答對一題，redis的result增加一
+        redis.hincrby(user_profile,"result") 
+        reply = 'Correct!!'
+    #製作一個回覆list
+    reply_message_list = [
+        TextSendMessage(text=reply),
+        TextSendMessage(text=a["true_answer_decribe_content"]+"\n\n"),
+        TextSendMessage(text=a["external_link"])
+        ]
+    #進行回覆
+    
+    return reply_message_list
+
+
+# In[12]:
 
 
 """
@@ -426,78 +388,28 @@ def handle_post_message(event):
     #給按了答案的回覆
     elif (data['type']==['answer']):
         if (data['question_type']==['sysops']):
-            #去API取得考題資訊
-            a = answer('sysops',data['question_id'][0])
-            #預設為錯誤的reply
-            reply = "Error\nAns:%s" %a["true_answer"]
-            #假如正確的話回一個正確的reply
-            if (data['result']==['True']):
-                #每答對一題，redis的result增加一
-                redis.hincrby(user_profile,"result") 
-                reply = 'Correct!!'
-            #製作一個回覆list
-            reply_message_list = [
-                TextSendMessage(text=reply),
-                TextSendMessage(text=a["true_answer_decribe_content"]+"\n\n"),
-                TextSendMessage(text=a["external_link"])
-                ]
             #進行回覆
             line_bot_api.reply_message(
                 event.reply_token,
-                reply_message_list
+                result('sysops',data,user_profile)
             )
         elif (data['question_type']==['devlop']):
-            a = answer('devlop',data['question_id'][0])
-            reply = "Error\nAns:%s" %a["true_answer"]
-            if (data['result']==['True']):
-                #每答對一題，redis的result增加一
-                redis.hincrby(user_profile,"result") 
-                reply = 'Correct!!'
-    
-            reply_message_list = [
-                TextSendMessage(text=reply),
-                TextSendMessage(text=a["true_answer_decribe_content"]+"\n\n"),
-                TextSendMessage(text=a["external_link"])
-                ]
+            #進行回覆
             line_bot_api.reply_message(
                 event.reply_token,
-                reply_message_list
+                result('devlop',data,user_profile)
             )
         elif (data['question_type']==['sa']):
-            a = answer('sysops',data['question_id'][0])
-            reply = "Error\nAns:%s" %a["true_answer"]
-            if (data['result']==['True']):
-                #每答對一題，redis的result增加一
-                redis.hincrby(user_profile,"result") 
-                reply = 'Correct!!'
-    
-            reply_message_list = [
-                TextSendMessage(text=reply),
-                TextSendMessage(text=a["true_answer_decribe_content"]+"\n\n"),
-                TextSendMessage(text=a["external_link"])
-            ]
             line_bot_api.reply_message(
                 event.reply_token,
-                reply_message_list
+                result('sa',data,user_profile)
             )
-    
-    #給之後的按鈕，看總答對跟回答題數
-    elif (data['type']==['total']):
-        correct = redis.hget(user_profile,"result")
-        total = redis.hget(user_profile,"total")
-        sa_qid = redis.hget(user_profile,"sa_qid")
-        sys_qid = redis.hget(user_profile,"sys_qid")
-        dev_qid = redis.hget(user_profile,"dev_qid")
-        line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text="各類回答紀錄\nsa:%s/100\ndeveloper:%s/100\nsysops:%s/100" % (sa_qid,sys_qid,dev_qid) ),
-        TextSendMessage(text="總共答對 (%s)題\n總共回答 (%s)題" % (correct,total)))
-        
+      
     else:
         pass
 
 
-# In[12]:
+# In[13]:
 
 
 '''
@@ -515,29 +427,27 @@ def handle_message(event):
     user_profile = event.source.user_id
     if (event.message.text.find('choose:')!= -1):
         pass
-    elif (event.message.text.find('record')!= -1):      
-        #總答對題數
-        correct = redis.hget(user_profile,"result")
-        #總回答題數
-        total = redis.hget(user_profile,"total")
-        #回覆的訊息串
-        line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text="總共答對 (%s)題\n總共回答 (%s)題" % (correct,total)))
     elif (event.message.text.find('detail')!= -1):
         sa_qid = redis.hget(user_profile,"sa_qid")
         sys_qid = redis.hget(user_profile,"sys_qid")
         dev_qid = redis.hget(user_profile,"dev_qid")
+        #總答對題數
+        correct = redis.hget(user_profile,"result")
+        #總回答題數
+        total = redis.hget(user_profile,"total")
+        reply_list = [
+            TextSendMessage(text="各類回答紀錄\nsa:%s/100\ndeveloper:%s/100\nsysops:%s/100" % (sa_qid,sys_qid,dev_qid) ),
+            TextSendMessage(text="總共答對 (%s)題\n總共回答 (%s)題" % (correct,total))
+        ]
         line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text="各類回答紀錄\nsa:%s/100\ndeveloper:%s/100\nsysops:%s/100" % (sa_qid,sys_qid,dev_qid) )
-        )
-        
+            event.reply_token,
+            reply_list
+            )
         
     else:
         line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text="請使用下方功能選單\n或是輸入下方字串\nrecord\ndetail"))
+        TextSendMessage(text="請使用下方功能選單\n或是輸入下方字串\ndetail"))
 
 
 # In[ ]:
