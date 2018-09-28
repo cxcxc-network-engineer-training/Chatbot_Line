@@ -1,5 +1,21 @@
 # Chatbot_Line
 -------------------------
+
+
+先  
+>git clone https://github.com/iii-cutting-edge-tech-lab/Chatbot_Line.git  
+
+>cd Chatbot_Dev  
+
+開啟環境流程(只供開發使用，只開啟jupyter、ngrok、Redis的container，要再開出Chatbot_Dev環境五台container才能連動)  
+>docker-compose up -d  
+
+透過瀏覽器訪問jupyter  
+http://本機ip:8888    
+
+程式碼都放在code內，可以用Jupyter編輯  
+
+
 底下是這個repo的資料夾結構  
 
 code/  
