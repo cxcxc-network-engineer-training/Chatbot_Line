@@ -7,7 +7,7 @@
 
 >cd Chatbot_Dev  
 
-開啟環境流程(只供開發使用，只開啟jupyter、ngrok、Redis的container，要再開出Chatbot_Dev環境五台container才能連動)  
+開啟環境流程(只供開發使用，只開啟jupyter、ngrok、Redis的container，要再開出Chatbot_Dev環境才有五台container才能連動)  
 >docker-compose up -d  
 
 透過瀏覽器訪問jupyter  
